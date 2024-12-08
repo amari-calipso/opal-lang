@@ -1,7 +1,7 @@
 """
 MIT License
 
-Copyright (c) 2020 thatsOven
+Copyright (c) 2020 Amari Calipso
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -46,9 +46,9 @@ class Token:
 
         if self.line >= self.maxline - 3:
             return range(self.maxline - 5, self.maxline)
-        
+
         return range(self.line - 3, self.line + 2)
-    
+
     def __message(self, type_, color, msg, location):
         if self.tokens is None: print(color + f"{type_}{colorama.Style.RESET_ALL} {location[0]}:", msg)
         else:
@@ -60,12 +60,12 @@ class Token:
             for line in self.__getlines():
                 if line == self.line - 1:
                     print(
-                        f"{str(line - location[1] + offs).rjust(maxlineLen)} | " + self.tokens.source[line].rstrip() + "\n" + 
+                        f"{str(line - location[1] + offs).rjust(maxlineLen)} | " + self.tokens.source[line].rstrip() + "\n" +
                         (" " * maxlineLen) + " |" + (" " * (self.pos + 1)) + color + ("^" * len(self.tok)) + colorama.Style.RESET_ALL
                     )
 
                     continue
-                
+
                 print(f"{str(line - location[1] + offs).rjust(maxlineLen)} | " + self.tokens.source[line].rstrip())
 
     def error(self, msg, location):
@@ -107,12 +107,12 @@ class Tokens:
             tmp = self.tokens[self.pos]
             self.pos += 1
             return tmp
-        
+
         self.tokens[self.pos - 1].error("invalid syntax: the expression wasn't properly closed. no tokens remaining", "<main>")
-    
+
     def last(self) -> Token:
         return self.tokens[self.pos - 1]
-    
+
     @classmethod
     def replaceTokens(self, tokens):
         i = 0
@@ -144,10 +144,10 @@ class Tokens:
             first.tok += next.tok
             tokens.append(first)
             return True
-        
+
         tokens.append(first)
         return False
-    
+
     def join(self):
         buf = ""
         lastIsIdentifier = False
@@ -181,7 +181,7 @@ class Tokens:
         inString      = False
         inStringAlt   = False
         lastSym       = False
-        
+
         for ch in source:
             if inLineComment:
                 if ch == "\n":
@@ -190,14 +190,14 @@ class Tokens:
                     pos   = 0
                     tmp.append(Token(MutableStringBuffer(), line, pos, self))
                     continue
-                
+
                 pos += 1
                 continue
 
             match ch:
                 case " " | "\t":
                     if inString or inStringAlt: tmp[-1].tok += ch
-                    else:        
+                    else:
                         tmp.append(Token(MutableStringBuffer(), line, pos + 1, self))
                 case "#":
                     if inString or inStringAlt: tmp[-1].tok += ch
@@ -244,7 +244,7 @@ class Tokens:
                             tmp.append(Token(tok, line, pos, self))
                         else:
                             tmp[-1].tok += ch
-                    else:                            
+                    else:
                         lastSym = True
                         tok = MutableStringBuffer()
                         tok += ch
@@ -301,7 +301,7 @@ class Tokens:
                                 token.tok += next.tok
                                 token.tok += tmp[i].tok
                                 i += 1
-                            else: 
+                            else:
                                 token.tok += next.tok
                         else:
                             token.tok += tmp[i].tok
@@ -317,7 +317,7 @@ class Tokens:
                                 token.tok += next.tok
                                 token.tok += tmp[i].tok
                                 i += 1
-                            else: 
+                            else:
                                 token.tok += next.tok
                         else:
                             token.tok += tmp[i].tok
@@ -333,7 +333,7 @@ class Tokens:
                                 token.tok += next.tok
                                 token.tok += tmp[i].tok
                                 i += 1
-                            else: 
+                            else:
                                 token.tok += next.tok
                         else:
                             token.tok += tmp[i].tok
@@ -349,7 +349,7 @@ class Tokens:
                                 token.tok += next.tok
                                 token.tok += tmp[i].tok
                                 i += 1
-                            else: 
+                            else:
                                 token.tok += next.tok
                         else:
                             token.tok += tmp[i].tok

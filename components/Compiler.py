@@ -1,7 +1,7 @@
 """
 MIT License
 
-Copyright (c) 2020 thatsOven
+Copyright (c) 2020 Amari Calipso
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@ VERSION = (2024, 8, 4)
 SET_OPS = ("+=", "-=", "**=", "//=", "*=", "/=", "%=", "&=", "|=", "^=", ">>=", "<<=", "@=", "=")
 CYTHON_TYPES = (
     "short", "int", "long", "long long", "float", "bint",
-    "double", "long double", "list", "object", "str", 
+    "double", "long double", "list", "object", "str",
     "tuple", "dict", "range", "bytes", "bytearray", "complex"
 )
 CYTHON_FN_TYPES = CYTHON_TYPES + ("void", "bool")
@@ -71,7 +71,7 @@ def getArgsString(internalVars):
                 argsList.append(f"{mode}{name}:{type_}={default}")
 
     return ",".join(argsList)
-     
+
 class Compiler:
     def __new(self, tokens : Tokens, tabs, loop, objNames):
         next = tokens.next()
@@ -104,7 +104,7 @@ class Compiler:
                 else:
                     translates = "def"
 
-                hasThis = True 
+                hasThis = True
             case "record":
                 if self.nextAbstract:
                     self.nextAbstract = False
@@ -124,7 +124,7 @@ class Compiler:
                 translates = "class"
             case _:
                 return self.__newVar(tokens, tabs, loop, objNames)
-            
+
         if self.nextUnchecked:
             self.nextUnchecked = False
             self.__error('"unchecked" flag is not effective on functions, methods, records and classes', objType)
@@ -136,13 +136,13 @@ class Compiler:
             if next.tok != "(":
                 if self.nextAbstract:
                     self.nextAbstract = False
-                    
+
                 self.__error('expecting character "("', next)
                 return loop, objNames
             else: tokens.next()
-                        
+
             args = self.getSameLevelParenthesis("(", ")", tokens)
-            if hasThis: 
+            if hasThis:
                 if len(args) == 0:
                     args = [Token("this")]
                 else:
@@ -163,7 +163,7 @@ class Compiler:
                     if not args.isntFinished():
                         internalVars.append([argName, "dynamic", mode, ""])
                         break
-                    
+
                     next = args.peek()
                     if next is not None and next.tok == ":":
                         args.next()
@@ -177,7 +177,7 @@ class Compiler:
                         self.__error('"auto" cannot be used as a parameter type', next)
                         type_ = "dynamic"
 
-                    if not args.isntFinished(): 
+                    if not args.isntFinished():
                         internalVars.append([argName, type_, mode, ""])
                         break
 
@@ -189,10 +189,10 @@ class Compiler:
                         default = Tokens(default).join()
 
                         internalVars.append([argName, type_, mode, default])
-                        
-                        if tmp == "": 
+
+                        if tmp == "":
                             break
-                        else: 
+                        else:
                             next = tmp
                     else:
                         internalVars.append([argName, type_, mode, ""])
@@ -203,7 +203,7 @@ class Compiler:
                             next = args.next()
 
                     if next is None: break
-                
+
             if self.nextAbstract:
                 self.nextAbstract = False
 
@@ -225,7 +225,7 @@ class Compiler:
                 if peek.tok == ";":
                     tokens.next()
                     retType = "dynamic"
-                else:                        
+                else:
                     _, retType = self.getUntilNotInExpr(";", tokens, True, advance = False)
                     retType = Tokens(retType).join()
 
@@ -237,7 +237,7 @@ class Compiler:
                     retType = CYTHON_TO_PY_TYPES[retType]
 
                 argsString = getArgsString(internalVars)
-                        
+
                 if retType == "dynamic":
                     self.out += (" " * tabs) + translates + " " + name.tok + f"({argsString}):pass\n"
                 else:
@@ -248,7 +248,7 @@ class Compiler:
                     self.out += (" " * tabs) + f"globals()['{name.tok}']={name.tok}\n"
 
                 return loop, objNames
-            
+
             if isRecord:
                 if self.nextStatic:
                     self.nextStatic = False
@@ -286,9 +286,9 @@ class Compiler:
                     self.out += (" " * tabs) + f"globals()['{name.tok}']={name.tok}\n"
 
                 return loop, objNames
-            
+
             self.newObj(objNames, name, "dynamic")
-        
+
             peek = tokens.peek()
             if peek is None:
                 self.__error('invalid syntax: expecting "{" or type identifier', next)
@@ -314,7 +314,7 @@ class Compiler:
                                 canCpdef = False
                                 break
 
-                        if canCpdef: 
+                        if canCpdef:
                             translates = "cpdef"
                             cyInternalVars = internalVars.copy()
                             for i in range(len(internalVars)):
@@ -327,13 +327,13 @@ class Compiler:
                 argsString = getArgsString(internalVars)
         else:
             argsString = ""
-            
+
             next = tokens.peek()
             if next.tok == ":":
                 next = tokens.next()
                 next, args = self.getUntil("{", tokens, True)
                 argsString = Tokens(args).join() + ",OpalObject"
-                
+
                 if self.nextAbstract:
                     self.nextAbstract = False
                     argsString += ",_ABSTRACT_BASE_CLASS_,OpalObject"
@@ -375,7 +375,7 @@ class Compiler:
             if self.nextCdef:
                 self.nextCdef = False
                 self.__error('$cdef can only be used on classes and optimizable functions', objType)
-            
+
             if isClass and argsString == "":
                 self.out += (" " * tabs) + translates + " " + name.tok + "(OpalObject):"
             elif isClass or retType == "dynamic":
@@ -392,11 +392,11 @@ class Compiler:
                 self.out += (" " * tabs) + f"globals()['{name.tok}']={name.tok}\n"
 
             return loop, objNames
-        
+
         self.out += "\n"
-        
+
         block = Tokens(block)
-        
+
         if translates == "class":
             self.__nameStack.push((name.tok, "class"))
 
@@ -448,7 +448,7 @@ class Compiler:
             self.out += (" " * tabs) + f"globals()['{name.tok}']={name.tok}\n"
 
         return loop, objNames
-    
+
     def __newVar(self, tokens : Tokens, tabs, loop, objNames):
         next = tokens.last()
         typeTok = next
@@ -457,11 +457,11 @@ class Compiler:
             type_ = Tokens(self.getSameLevelParenthesis("(", ")", tokens)).join()
         else:
             type_ = next.tok
-        
+
         cyType = False
         if (
             self.__cy and (self.nextStatic or self.static) and
-            self.__nameStack.lookforBeforeFn("class") and 
+            self.__nameStack.lookforBeforeFn("class") and
             (not self.nextUnchecked) and (not self.nextGlobal)
         ):
             if type_ in CYTHON_TYPES or self.nextCdef:
@@ -473,7 +473,7 @@ class Compiler:
                     self.__note("consider moving these declarations outside of a conditional so they can be automatically optimized", typeTok)
                 else:
                     cyType = True
-        
+
         if self.nextStatic: self.nextStatic = False
 
         if (not cyType) and type_ in CYTHON_TO_PY_TYPES:
@@ -498,7 +498,7 @@ class Compiler:
 
         _, variablesDef = self.getUntilNotInExpr(";", tokens, True, advance = False)
         variablesDef = Tokens(variablesDef)
-        
+
         next = variablesDef.next()
 
         while True:
@@ -507,7 +507,7 @@ class Compiler:
             if cyType: self.newObj(objNames, name, "dynamic")
             else:      self.newObj(objNames, name, type_)
 
-            if not variablesDef.isntFinished(): 
+            if not variablesDef.isntFinished():
                 if type_ not in ("dynamic", "auto"):
                     if cyType:
                         self.out += (" " * tabs) + "cdef " + type_ + " " + name.tok + "\n"
@@ -515,10 +515,10 @@ class Compiler:
                         self.out += (" " * tabs) + name.tok + ":" + type_ + "\n"
 
                 if type_ == "auto":
-                    self.__error(f'auto-typed variables cannot be defined without being assigned', name) 
+                    self.__error(f'auto-typed variables cannot be defined without being assigned', name)
 
                 break
-                
+
             next = variablesDef.next()
             if   next.tok == "=":
                 next, value = self.getUntilNotInExpr(",", variablesDef, True, False)
@@ -537,7 +537,7 @@ class Compiler:
                             self.out += (" " * tabs) + f"globals()['{name.tok}']=_OPAL_CHECK_TYPE_({value},{type_})\n"
                         else:
                             self.out += (" " * tabs) + name.tok + f":{type_}=_OPAL_CHECK_TYPE_({value},{type_})\n"
-            elif next.tok == ",": 
+            elif next.tok == ",":
                 if (not unchecked) and type_ not in ("dynamic", "auto"):
                     if cyType:
                         self.out += (" " * tabs) + "cdef " + type_ + " " + name.tok + "\n"
@@ -547,14 +547,14 @@ class Compiler:
                 next = variablesDef.next()
 
                 if type_ == "auto":
-                    self.__error(f'auto-typed variables cannot be defined without being assigned', name) 
+                    self.__error(f'auto-typed variables cannot be defined without being assigned', name)
             else:
-                self.__error('invalid syntax: expecting "," or "="', next) 
+                self.__error('invalid syntax: expecting "," or "="', next)
 
             if next == "": break
-        
+
         return loop, objNames
-    
+
     def __not(self, tokens : Tokens, tabs, loop, objNames):
         _, var = self.getUntilNotInExpr(";", tokens, True, advance = False)
 
@@ -583,18 +583,18 @@ class Compiler:
         if self.nextGlobal:
             self.nextGlobal = False
             self.__error('"global" flag is not effective on inline boolean inversions', last)
-    
+
         self.out += (" " * tabs) + Tokens(var + [Token("="), Token("not")] + var).join() + "\n"
 
         return loop, objNames
-    
+
     def __asyncGen(self, keyw):
         def fn(tokens : Tokens, tabs, loop, objNames):
             self.out += (" " * tabs) + keyw + " "
             return loop, objNames
-        
+
         return fn
-    
+
     def __flagsError(self, statement, tok):
         if self.nextUnchecked:
             self.nextUnchecked = False
@@ -619,7 +619,7 @@ class Compiler:
         if self.nextGlobal:
             self.nextGlobal = False
             self.__error(f'"global" flag is not effective on "{statement}" statement', tok)
-    
+
     def __return(self, tokens : Tokens, tabs, loop, objNames):
         kw = tokens.last()
 
@@ -643,7 +643,7 @@ class Compiler:
         if self.nextInline:
             self.nextInline = False
             self.__error('"inline" flag is not effective on "return" statement', kw)
-        
+
         if self.nextCdef:
             self.nextCdef = False
             self.__error('$cdef is not effective on "return" statement', kw)
@@ -657,14 +657,14 @@ class Compiler:
             tokens.next()
             self.out += (" " * tabs) + "return\n"
             return loop, objNames
-        
+
         _, val = self.getUntilNotInExpr(";", tokens, True, advance = False)
 
         if self.nextUnchecked:
             self.nextUnchecked = False
             unchecked = True
         else: unchecked = False
-           
+
         if cyFunction or unchecked or fnProperties[2] == "dynamic" or self.typeMode == "none":
             self.out += (" " * tabs) + Tokens([Token("return")] + val).join() + "\n"
         else:
@@ -677,7 +677,7 @@ class Compiler:
             ).join() + "\n"
 
         return loop, objNames
-    
+
     def __break(self, tokens : Tokens, tabs, loop, objNames):
         keyw = tokens.last()
         next = tokens.peek()
@@ -694,7 +694,7 @@ class Compiler:
         self.out += (" " * tabs) + "break\n"
 
         return loop, objNames
-    
+
     def __continue(self, tokens : Tokens, tabs, loop, objNames):
         keyw = tokens.last()
         next = tokens.peek()
@@ -716,7 +716,7 @@ class Compiler:
         self.out += (" " * tabs) + "continue\n"
 
         return loop, objNames
-    
+
     def __untilEnd(self, keyw):
         def fn(tokens : Tokens, tabs, loop, objNames):
             _, val = self.getUntilNotInExpr(";", tokens, True, advance = False)
@@ -724,16 +724,16 @@ class Compiler:
             self.out += (" " * tabs) + Tokens([Token(keyw)] + val).join() + "\n"
 
             return loop, objNames
-    
+
         return fn
-    
+
     def __ignore(self, tokens : Tokens, tabs, loop, objNames):
         self.__flagsError("ignore", tokens.last())
 
         _, val = self.getUntilNotInExpr(";", tokens, True, advance = False)
         self.out += (" " * tabs) + Tokens([Token("except")] + val + [Token(":pass")]).join() + "\n"
         return loop, objNames
-    
+
     def __unchecked(self, tokens : Tokens, tabs, loop, objNames):
         kw = tokens.last()
 
@@ -748,7 +748,7 @@ class Compiler:
         self.nextUnchecked = True
 
         return loop, objNames
-    
+
     def __static(self, tokens: Tokens, tabs, loop, objNames):
         if self.nextStatic:
             self.__error('"static" flag was used twice. remove this flag', tokens.last())
@@ -763,16 +763,16 @@ class Compiler:
 
             if len(block) == 0:
                 return loop, objNames
-            
+
             backStatic = self.static
             self.static = True
             loop, objNames = self.__compiler(Tokens(block), tabs, loop, objNames)
             self.static = backStatic
-        else: 
+        else:
             self.__error('expecting ":" or "{" after "static"', next)
 
         return loop, objNames
-    
+
     def __global(self, tokens: Tokens, tabs, loop, objNames):
         next = tokens.peek()
         if next.tok == ":":
@@ -782,9 +782,9 @@ class Compiler:
             tokens.next()
             self.nextGlobal = True
             return loop, objNames
-        
+
         return self.__untilEnd("global")(tokens, tabs, loop, objNames)
-    
+
     def __inline(self, tokens: Tokens, tabs, loop, objNames):
         if self.nextInline:
             self.__error('"inline" flag was used twice. remove this flag', tokens.last())
@@ -793,11 +793,11 @@ class Compiler:
         if next.tok == ":":
             tokens.next()
             self.nextInline = True
-        else: 
+        else:
             self.__error('expecting ":" after "inline"', next)
 
         return loop, objNames
-    
+
     def __abstract(self, tokens : Tokens, tabs, loop, objNames):
         if self.nextAbstract:
             self.__error('"abstract" flag was used twice. remove this flag', tokens.last())
@@ -814,7 +814,7 @@ class Compiler:
             self.headers += "from abc import abstractmethod\nfrom abc import ABC as _ABSTRACT_BASE_CLASS_\n"
 
         return loop, objNames
-    
+
     def __printReturn(self, tokens : Tokens, tabs, loop, objNames):
         self.__flagsError("?", tokens.last())
 
@@ -824,7 +824,7 @@ class Compiler:
         self.out += (" " * tabs) + "_OPAL_PRINT_RETURN_(" + strVal + ")\n"
 
         return loop, objNames
-    
+
     def __package(self, tokens : Tokens, tabs, loop, objNames):
         self.__flagsError("package", tokens.last())
 
@@ -836,21 +836,21 @@ class Compiler:
         self.out += (" " * tabs) + "from " + strName + " "
 
         return loop, objNames
-    
+
     def __import(self, tokens : Tokens, tabs, loop, objNames):
         keyw = tokens.last()
         self.__flagsError("import", keyw)
         _, imports = self.getUntilNotInExpr(";", tokens, True, advance = False)
-        
+
         if len(imports) == 1 and imports[0].tok == "*":
             if self.lastPackage == "":
                 self.__error('cannot use "import *" if no package is defined', keyw)
                 return loop, objNames
-            
+
             if "." in self.lastPackage:
                   self.imports.append(self.lastPackage.split(".")[0])
             else: self.imports.append(self.lastPackage)
-            
+
             modl = import_module(self.lastPackage)
             for name in dir(modl):
                 if callable(getattr(modl, name)):
@@ -860,9 +860,9 @@ class Compiler:
             self.out += "import *\n"
 
             return loop, objNames
-        
+
         imports = Tokens(imports)
-        
+
         while imports.isntFinished():
             next = imports.next()
             if next == "": break
@@ -872,14 +872,14 @@ class Compiler:
 
             next, nameBuf = self.getUntilNotInExpr(("as", ","), imports, True, False, False)
             if next != "" and next.tok in ("as", ","): imports.pos -= 1
-            if len(nameBuf) != 0: 
+            if len(nameBuf) != 0:
                 name = name.copy()
                 name.tok = Tokens(nameBuf).join()
 
             if not imports.isntFinished():
                 self.newObj(objNames, name, "dynamic")
                 break
-                    
+
             next = imports.next()
             if next.tok == "as":
                 next = imports.next()
@@ -895,7 +895,7 @@ class Compiler:
             if next.tok != ",":
                 self.__error("invalid syntax: modules should be separated by commas", next)
 
-        if self.lastPackage != "": 
+        if self.lastPackage != "":
             if "." in self.lastPackage:
                   self.imports.append(self.lastPackage.split(".")[0])
             else: self.imports.append(self.lastPackage)
@@ -905,7 +905,7 @@ class Compiler:
         self.out += (" " * tabs) + "import " + imports.join() + "\n"
 
         return loop, objNames
-    
+
     def __incDec(self, op):
         def fn(tokens : Tokens, tabs, loop, objNames):
             self.__flagsError(op * 2, tokens.last())
@@ -915,14 +915,14 @@ class Compiler:
             self.out += (" " * tabs) + strVar + op + "=1\n"
 
             return loop, objNames
-            
+
         return fn
-    
+
     def __use(self, tokens : Tokens, tabs, loop, objNames):
         self.__flagsError("use", tokens.last())
         _, identifiers = self.getUntilNotInExpr(";", tokens, True, advance = False)
         identifiers = Tokens(identifiers)
-        
+
         next = identifiers.next()
         while True:
             name = next
@@ -930,17 +930,17 @@ class Compiler:
             self.newObj(objNames, name, "dynamic")
 
             if not identifiers.isntFinished(): break
-                
+
             next = identifiers.next()
             if next.tok == ",":
                 next = identifiers.next()
             else:
-                self.__error('invalid syntax: expecting ","', next) 
+                self.__error('invalid syntax: expecting ","', next)
 
             if next == "": break
-        
+
         return loop, objNames
-    
+
     def __simpleBlock(self, keyw, kwname, push = None):
         def fn(tokens : Tokens, tabs, loop, objNames):
             self.checkDirectNext("{", f'"{kwname}"', tokens)
@@ -950,7 +950,7 @@ class Compiler:
 
             if len(block) == 0:
                 self.out += ":pass\n"
-            else: 
+            else:
                 self.out += ":\n"
 
                 if push is None:
@@ -961,17 +961,17 @@ class Compiler:
                     self.__nameStack.pop()
 
             return loop, objNames
-        
+
         return fn
-    
+
     def __block(self, keyw, inLoop = None, content = None, after = None, push = None):
         def fn(tokens : Tokens, tabs, loop, objNames):
             loopNotDef = inLoop is None
-            if loopNotDef: 
+            if loopNotDef:
                 internalLoop = loop
             else:
                 internalLoop = inLoop
-            
+
             if content is None:
                 _, localContent = self.getUntilNotInExpr("{", tokens, True, advance = False)
             else: localContent = content
@@ -986,7 +986,7 @@ class Compiler:
                 if len(block) == 0:
                     self.out += ":pass\n"
                     return loop, objNames
-                 
+
                 self.out += ":\n"
 
             if push is None:
@@ -999,9 +999,9 @@ class Compiler:
             if loopNotDef: loop = tmp
 
             return loop, objNames
-        
+
         return fn
-        
+
     def __main(self, tokens : Tokens, tabs, loop, objNames):
         keyw = tokens.last()
 
@@ -1024,12 +1024,12 @@ class Compiler:
                 return self.__simpleBlock("cpdef void _OPAL_MAIN_FUNCTION_()", "main()", ("main", "cfn"))(tokens, tabs, loop, objNames)
             else:
                 return self.__simpleBlock("def _OPAL_MAIN_FUNCTION_()", "main()", ("main", "fn"))(tokens, tabs, loop, objNames)
-        
+
         if self.__cy:
             return self.__simpleBlock('if"_OPAL_RUN_AS_MAIN_"in _ENVIRON_', "main", (None, "conditional"))(tokens, tabs, loop, objNames)
         else:
             return self.__simpleBlock("if __name__=='__main__'", "main", (None, "conditional"))(tokens, tabs, loop, objNames)
-    
+
     def __namespace(self, tokens : Tokens, tabs, loop, objNames):
         kw = tokens.last()
         next = tokens.next()
@@ -1055,7 +1055,7 @@ class Compiler:
         if tmp.tok != "{":
             self.__error('invalid syntax: expecting "{" after namespace definition', tmp)
             return loop, objNames
-        
+
         if not self.flags["namespace"]:
             self.flags["namespace"] = True
             self.headers += "from libs._internals import OpalNamespace\n"
@@ -1075,7 +1075,7 @@ class Compiler:
             self.out += (" " * tabs) + f"globals()['{next.tok}']={next.tok}\n"
 
         return loop, objNames
-    
+
     def __do(self, tokens : Tokens, tabs, loop, objNames):
         self.__flagsError("do", tokens.last())
 
@@ -1102,7 +1102,7 @@ class Compiler:
         self.out += (" " * (tabs + 1)) + check
 
         return loop, objNames
-    
+
     def __repeat(self, tokens : Tokens, tabs, loop, objNames):
         kw = tokens.last()
 
@@ -1146,18 +1146,18 @@ class Compiler:
 
             if intVal == 0:
                 warnTok = Token(
-                    " " * (valList[-1].pos - valList[0].pos + 1), 
+                    " " * (valList[-1].pos - valList[0].pos + 1),
                     valList[0].line, valList[0].pos, valList[0].tokens
                 )
 
                 warnTok.maxline = valList[0].maxline
-                
+
                 self.__warning('a 0-times "repeat" statement is being used', warnTok)
 
                 return loop, objNames
-            
+
             self.out += " " * tabs
-            
+
             if intVal > 0:
                 self.out += f"for _ in range({value}):"
             else:
@@ -1166,12 +1166,12 @@ class Compiler:
         if len(block) == 0:
             self.out += "pass\n"
             return loop, objNames
-        
+
         self.out += "\n"
 
         _, objNames = self.__compiler(Tokens(block), tabs + 1, GenericLoop(), objNames)
         return loop, objNames
-    
+
     def __matchLoop(self, tokens : Tokens, tabs, loop, objNames, value, op, nocheck):
         if op: kw = "if"
 
@@ -1180,7 +1180,7 @@ class Compiler:
 
         while tokens.isntFinished():
             next = tokens.next()
-            
+
             if next.tok.startswith('"""') or next.tok.startswith("'''"):
                 self.out += next.tok + "\n"
                 continue
@@ -1193,7 +1193,7 @@ class Compiler:
                     if op:
                         if defaultMet:
                             self.__error('cannot use "case" after "default" in an defined operator "match" statement', next)
-                        
+
                         if nocheck:
                             loop, objNames = self.__block(
                                 Tokens([Token(kw)] + value + op).join()
@@ -1229,11 +1229,11 @@ class Compiler:
                     self.__error('invalid identifier in "match" statement body', next)
 
         return loop, objNames
-    
+
     def __needsChecks(self, tokens: Tokens):
         while tokens.isntFinished():
             next = tokens.next()
-            
+
             if next.tok.startswith('"""') or next.tok.startswith("'''"):
                 self.out += next.tok + "\n"
                 continue
@@ -1250,7 +1250,7 @@ class Compiler:
                     self.__error('invalid identifier in "match" statement body', next)
 
         return False
-    
+
     def __match(self, tokens : Tokens, tabs, loop, objNames):
         self.__flagsError("match", tokens.last())
 
@@ -1263,7 +1263,7 @@ class Compiler:
             next = tokens.next()
             if next.tok != "(":
                 self.__error('invalid syntax: expecting "(" after "match:"', next)
-            
+
             op = self.getSameLevelParenthesis("(", ")", tokens)
 
             if len(op) == 0:
@@ -1276,13 +1276,13 @@ class Compiler:
 
         if len(block) == 0:
             return loop, objNames
-        
+
         check = self.__needsChecks(Tokens(block))
-        
+
         if check:
             matched = str(tabs)
             self.out += (" " * tabs) + f"_OPAL_MATCHED_{tabs}=False\n"
-    
+
         if op is None:
             self.out += (" " * tabs) + Tokens([Token("match")] + value).join() +":\n"
 
@@ -1294,7 +1294,7 @@ class Compiler:
             self.out += (" " * tabs) + f"del _OPAL_MATCHED_{matched}\n"
 
         return loop, objNames
-    
+
     @classmethod
     def __getType(self, type_):
         match type_:
@@ -1304,7 +1304,7 @@ class Compiler:
                 return "set"
             case "deleter":
                 return "delete"
-    
+
     def __modifier(self, type_, name = None):
         def fn(tokens : Tokens, tabs, loop, objNames):
             if name is None:
@@ -1312,7 +1312,7 @@ class Compiler:
                 if next.tok != "<":
                     self.__error(f'expecting "<" after {type_} outside of a "property" statement', next)
                     localName = next
-                else: 
+                else:
                     tokens.next()
                     localName = Tokens(self.getSameLevelParenthesis("<", ">", tokens)).join()
             else: localName = name
@@ -1349,16 +1349,16 @@ class Compiler:
                 self.checkDirectNext(";", "abstract property method definition", tokens)
                 self.out += "pass\n"
                 return loop, objNames
-            
+
             self.checkDirectNext("{", "property method definition", tokens)
             block = self.getSameLevelParenthesis("{", "}", tokens)
 
             if len(block) == 0:
                 self.out += "pass\n"
                 return loop, objNames
-            
+
             self.out += "\n"
-            
+
             if name is None:
                 self.__nameStack.push((f"{self.__getType(type_)}<{localName}>", "fn", "dynamic"))
             else:
@@ -1367,13 +1367,13 @@ class Compiler:
             self.__compiler(Tokens(block), tabs + 1, loop, intObjs)
             self.__nameStack.pop()
             return loop, objNames
-        
+
         return fn
-    
+
     def __propertyLoop(self, tokens : Tokens, tabs, loop, objNames, name):
         while tokens.isntFinished():
             next = tokens.next()
-            
+
             if next.tok.startswith('"""') or next.tok.startswith("'''"):
                 self.out += next.tok + "\n"
                 continue
@@ -1389,7 +1389,7 @@ class Compiler:
                     self.__abstract(tokens, tabs, loop, objNames)
                 case _:
                     self.__error('invalid identifier in "property" statement body', next)
-    
+
     def __property(self, tokens : Tokens, tabs, loop, objNames):
         kw = tokens.last()
 
@@ -1418,16 +1418,16 @@ class Compiler:
 
         if len(value) > 1:
             self.__error('property name should contain only one token', value[0])
-        
+
         self.newObj(objNames, value[0], "dynamic")
 
         if len(block) == 0:
             return loop, objNames
-        
+
         self.out += (" " * tabs) + Tokens([value[0], Token("="), Token("property()")]).join() + "\n"
 
         self.__nameStack.push((value[0].tok, "property"))
-        
+
         if self.nextStatic:
             self.nextStatic = False
 
@@ -1436,12 +1436,12 @@ class Compiler:
             self.__propertyLoop(Tokens(block), tabs, loop, objNames, value[0])
             self.static = backStatic
         else:
-            self.__propertyLoop(Tokens(block), tabs, loop, objNames, value[0])        
-        
+            self.__propertyLoop(Tokens(block), tabs, loop, objNames, value[0])
+
         self.__nameStack.pop()
 
         return loop, objNames
-    
+
     def __getInlineIncDec(self, variablesDef):
         i = 0
         while i < len(variablesDef):
@@ -1450,7 +1450,7 @@ class Compiler:
             elif variablesDef[i].tok == "--":
                  variablesDef[i].tok = "-="
             else:
-                i += 1 
+                i += 1
                 continue
 
             if i + 1 < len(variablesDef):
@@ -1460,14 +1460,14 @@ class Compiler:
             i += 2
 
         return variablesDef
-    
+
     def __handleAssignmentChain(self, tabs, objNames, variablesDef, saveObjs = True):
         buf  = ""
         objs = []
 
         if len(variablesDef) != 0:
             variablesDef = Tokens(self.__getInlineIncDec(variablesDef))
-                    
+
             next = variablesDef.next()
 
             while True:
@@ -1475,7 +1475,7 @@ class Compiler:
                 next = variablesDef.peek()
 
                 if next is None or next.tok in SET_OPS + (",", ):
-                    if saveObjs: 
+                    if saveObjs:
                         self.newObj(objNames, name, "dynamic")
                     else:
                         objs += [name, Token(",")]
@@ -1500,23 +1500,23 @@ class Compiler:
                         name = Token(Tokens(nameBuf).join())
 
                 if not variablesDef.isntFinished(): break
-                            
+
                 if   next.tok in SET_OPS:
                     op = next.tok
                     next, value = self.getUntilNotInExpr(",", variablesDef, True, False)
                     value = Tokens(value).join()
 
                     buf += (" " * tabs) + name.tok + op + value + "\n"
-                elif next.tok == ",": 
+                elif next.tok == ",":
                     next = variablesDef.next()
                 else:
-                    self.__error('invalid syntax: expecting "," or any assignment operator', next) 
+                    self.__error('invalid syntax: expecting "," or any assignment operator', next)
 
                 if next == "": break
 
         if saveObjs: return objNames, buf
-        else:        return objs[:-1], buf 
-    
+        else:        return objs[:-1], buf
+
     def __for(self, tokens : Tokens, tabs, loop, objNames):
         keyw = tokens.last()
         self.__flagsError("for", keyw)
@@ -1533,7 +1533,7 @@ class Compiler:
                     objNames, buf = self.__handleAssignmentChain(tabs, objNames, variablesDef)
                     self.out += buf
 
-                if tokens.peek().tok == ";": 
+                if tokens.peek().tok == ";":
                     tokens.next()
                     condition = [Token("True")]
                 else:
@@ -1575,7 +1575,7 @@ class Compiler:
             case _:
                 self.__error('invalid syntax: using an unrecognized amount of semicolons in a for loop', keyw)
                 return loop, objNames
-            
+
         block = self.getSameLevelParenthesis("{", "}", tokens)
 
         self.out += (" " * tabs) + Tokens(statement).join() + ":"
@@ -1585,15 +1585,15 @@ class Compiler:
             else:                self.out += "\n" + increments
 
             return loop, objNames
-        
+
         self.out += "\n"
-        
+
         _, objNames = self.__compiler(Tokens(block), tabs + 1, CompLoop(increments.lstrip()), objNames)
 
         if increments != "": self.out += increments
-            
+
         return loop, objNames
-    
+
     def __enum(self, tokens : Tokens, tabs, loop, objNames):
         if self.nextUnchecked:
             self.nextUnchecked = False
@@ -1621,7 +1621,7 @@ class Compiler:
         if len(value) == 0:
             if len(block) == 0:
                 return loop, objNames
-            
+
             inTabs = tabs
         else:
             if len(value) > 1:
@@ -1636,7 +1636,7 @@ class Compiler:
             if len(block) == 0:
                 self.out += "pass\n"
                 return loop, objNames
-            
+
             self.out += "\n"
 
             self.newObj(objNames, value[0], "dynamic")
@@ -1649,9 +1649,9 @@ class Compiler:
         if self.nextGlobal:
             self.nextGlobal = False
             self.out += (" " * tabs) + f"globals()['{value[0].tok}']={value[0].tok}\n"
-        
+
         return loop, objNames
-    
+
     def __dynamicStepOne(self, tokens : Tokens, tabs, objNames):
         _, expr = self.getUntilNotInExpr(";", tokens, True, advance = False)
         expr = Tokens(self.__getInlineIncDec(expr))
@@ -1674,21 +1674,21 @@ class Compiler:
 
                 names.append(Tokens(buf).join())
                 break
-                
+
             names.append(Tokens(name).join())
 
         if self.nextUnchecked:
             self.nextUnchecked = False
             self.out += (" " * tabs) + expr.join() + "\n"
-            
+
             for name in names:
                 if name in objNames and objNames[name] == "auto" and name in self.autoTypes:
                     del self.autoTypes[name]
 
             return None, None
-        
+
         return names, expr
-    
+
     def __init__(self):
         self.reset()
 
@@ -1706,7 +1706,7 @@ class Compiler:
         self.statementHandlers = {
             "new":                 self.__new,
             "property":            self.__property,
-            "get":                 self.__modifier("getter"), 
+            "get":                 self.__modifier("getter"),
             "set":                 self.__modifier("setter"),
             "delete":              self.__modifier("deleter"),
             "namespace":           self.__namespace,
@@ -1802,7 +1802,7 @@ class Compiler:
             next = self.getUntil(ch, tokens)
 
         return next
-    
+
     def getUntil(self, ch, tokens : Tokens, buffer = False):
         buf = []
         while tokens.isntFinished():
@@ -1822,7 +1822,7 @@ class Compiler:
 
         if buffer: return "", buf
         else:      return ""
-    
+
     def getUntilNotInExpr(self, ch, tokens : Tokens, buffer = False, errorNotFound = True, advance = True, unallowed = []):
         if type(ch) is str:
             ch = (ch, )
@@ -1885,15 +1885,15 @@ class Compiler:
 
                     if buffer: return next, buf
                     else:      return next
-                
+
             buf.append(next)
-                
+
         if rdBrack != 0:
             if lastRdBrack is None:
                 self.__error("unbalanced brackets ()", tokens.tokens[-1])
             else:
                 self.__error("unbalanced brackets ()", lastRdBrack)
-            
+
         if sqBrack != 0:
             if lastSqBrack is None:
                 self.__error("unbalanced brackets []", tokens.tokens[-1])
@@ -1935,12 +1935,12 @@ class Compiler:
 
             if pCount == 0:
                 return buf
-            
+
             buf.append(next)
 
         self.__error('unbalanced parenthesis "' + openCh + closeCh + '"', lastParen)
         return buf
-    
+
     def __variablesHandler(self, tokens : Tokens, tabs, objNames, autoCheck = True):
         names, expr = self.__dynamicStepOne(tokens, tabs, objNames)
         if names is None: return
@@ -1959,8 +1959,8 @@ class Compiler:
                         self.out += (" " * tabs) + f"{name}=_OPAL_CHECK_TYPE_({name},_OPAL_AUTOMATIC_TYPE_{name})\n"
                 else:
                     self.out += (" " * tabs) + f"{name}=_OPAL_CHECK_TYPE_({name},{objNames[name]})\n"
-    
-    def __compiler(self, tokens : Tokens, tabs, loop, objNames):  
+
+    def __compiler(self, tokens : Tokens, tabs, loop, objNames):
         while tokens.isntFinished():
             next = tokens.next()
 
@@ -1999,7 +1999,7 @@ class Compiler:
                         except:
                             self.__error(f'expecting an integer for "{signal}" signal', kw)
                             args = 0
-                        
+
                         next = tokens.peek()
                         if next.tok != ".":
                             self.__error(f'invalid syntax: expecting "." after "__OPALSIG[{signal}]({args})"', next)
@@ -2034,14 +2034,14 @@ class Compiler:
                     type_ = Tokens(self.getSameLevelParenthesis("(", ")", tokens)).join()
                 else:
                     type_ = next.tok
-                        
+
                 next = tokens.next()
                 if next is None or next.tok != "<-":
                     self.__error('unknown statement or identifier', first)
                     continue
 
                 names, _ = self.__dynamicStepOne(tokens.copy(), tabs, objNames)
-                if names is None: 
+                if names is None:
                     self.__warning("cannot find any variables to convert. it is recommended to remove the type conversion", next)
                     continue
 
@@ -2097,7 +2097,7 @@ class Compiler:
                 result += f"__OPALSIG[EMBED_INFER]({tabs})." + Tokens(strippedLine.rstrip()).join() + ";\n"
 
         return str(result)
-    
+
     def __include(self, result, file):
         self.__manualSig = False
         result += f'__OPALSIG[PUSH_NAME]("{os.path.basename(file)}","file")\n'
@@ -2107,12 +2107,12 @@ class Compiler:
             result += self.__preCompiler(self.readFile(file)) + "\n"
         result += "__OPALSIG[POP_NAME]()\n"
         return result
-    
+
     def __addLine(self, line, result, savingMacro, compTime, export, ifBlock):
         if savingMacro is None and compTime is None and export is None and ifBlock is None:
             result += line + "\n"
         else:
-            result += "\n" 
+            result += "\n"
 
             if savingMacro is not None:
                 savingMacro.add(line + "\n")
@@ -2135,10 +2135,10 @@ class Compiler:
 
         for i, line in enumerate(source.split("\n")):
             noSpaceLine = line.replace(" ", "")
-            if noSpaceLine == "": 
+            if noSpaceLine == "":
                 result += "\n"
                 continue
-            
+
             pyPre = line.lstrip().startswith("#opal$")
             if noSpaceLine[0] != "$" and not pyPre:
                 if inPy:
@@ -2158,16 +2158,16 @@ class Compiler:
 
             tokenizedLine = Tokens(line)
             tokenizedLine.next()
-            
+
             if pyPre: tokenizedLine.next()
 
             next = tokenizedLine.next()
             match next.tok:
                 case "include":
                     self.__manualSig = False
-                        
+
                     fileDir = self.getDir(Tokens(tokenizedLine.tokens[tokenizedLine.pos:]).join())
-                        
+
                     tmp = MutableStringBuffer()
                     tmp += f'__OPALSIG[PUSH_NAME]("{os.path.basename(fileDir)}","file")\n'
                     pyx = fileDir.endswith(".pyx")
@@ -2187,7 +2187,7 @@ class Compiler:
                 case "define":
                     name    = tokenizedLine.next().tok
                     content = Tokens(tokenizedLine.tokens[tokenizedLine.pos:]).join()
-                        
+
                     self.consts[name] = content
                 case "pdefine":
                     name    = tokenizedLine.next().tok
@@ -2209,7 +2209,7 @@ class Compiler:
                         if len(args) != 0:
                             savingMacro = Macro(name, Tokens(args).join())
                             continue
-            
+
                     savingMacro = Macro(name)
                 case "comptime":
                     if compTime is not None:
@@ -2221,7 +2221,7 @@ class Compiler:
                     if compTime is None:
                         self.__lineErr("cannot use $export outside of a comptime block", i)
                         continue
-                    
+
                     compTime += 'return "' + encode(self.replaceConsts(Tokens(tokenizedLine.tokens[tokenizedLine.pos:]).join(), self.preConsts | self.consts | COMPTIME_EXPORT_VARS)) + '";\n'
                 case "exportBlock":
                     if compTime is None:
@@ -2237,9 +2237,9 @@ class Compiler:
                     if savingMacro is not None:
                         if str(savingMacro.code) == "":
                             self.__lineWarn(f'the "{savingMacro.name}" macro is being saved as empty', i)
-                            
+
                         self.macros[savingMacro.name] = savingMacro
-                        savingMacro = None        
+                        savingMacro = None
                     elif export is not None:
                         strExport = str(export)
                         if strExport == "":
@@ -2252,7 +2252,7 @@ class Compiler:
                         strIfCode = str(ifBlock.ifCode)
                         if strIfCode == "":
                             self.__lineWarn("empty $if block", i)
-                        
+
                         if eval(self.replaceConsts(ifBlock.cond, self.preConsts | self.consts)):
                             result += strIfCode + "\n" * str(ifBlock.elseCode).count("\n")
                         else:
@@ -2265,8 +2265,8 @@ class Compiler:
                             continue
 
                         res = self.comptimeCompiler.compile(
-                            "global:new function _OPAL_COMPTIME_BLOCK_(){\nglobal COMPTIME_EXPORT_VARS;\n" + 
-                            self.replaceConsts(strCompTime.strip(), self.preConsts | self.consts) + 
+                            "global:new function _OPAL_COMPTIME_BLOCK_(){\nglobal COMPTIME_EXPORT_VARS;\n" +
+                            self.replaceConsts(strCompTime.strip(), self.preConsts | self.consts) +
                             "}\n", precomp = False
                         )
                         compTime = None
@@ -2281,7 +2281,7 @@ class Compiler:
                             self.__lineErr("comptime block threw an exception:\n" + ''.join(format_exception(e)), i)
                         else:
                             if exportCode is not None:
-                                result += str(exportCode) + "\n" 
+                                result += str(exportCode) + "\n"
                 case "call":
                     name = tokenizedLine.next().tok
 
@@ -2304,10 +2304,10 @@ class Compiler:
                                 buf += f"new dynamic {macro.args};"
                             else:
                                 buf += f"new dynamic {macro.args};{macro.args}={Tokens(args).join()};"
-                                
+
                     buf += macro.code
                     buf += "__OPALSIG[POP_NAME]()\n"
-                    
+
                     result, savingMacro, compTime, export, ifBlock = self.__addLine(str(buf), result, savingMacro, compTime, export, ifBlock)
                 case "nocompile":
                     inPy = True
@@ -2331,7 +2331,7 @@ class Compiler:
                     self.__manualSig = False
 
                     result, savingMacro, compTime, export, ifBlock = self.__addLine(
-                        f"__OPALSIG[EMBED_INFER](0)." + Tokens(tokenizedLine.tokens[tokenizedLine.pos:]).join() + ";", 
+                        f"__OPALSIG[EMBED_INFER](0)." + Tokens(tokenizedLine.tokens[tokenizedLine.pos:]).join() + ";",
                         result, savingMacro, compTime, export, ifBlock
                     )
                 case "cdef":
@@ -2356,7 +2356,7 @@ class Compiler:
                     self.__lineErr("unknown or incomplete precompiler instruction", i)
 
         return self.replaceConsts(str(result), self.consts)
-    
+
     def reset(self):
         self.macros    = {}
         self.consts    = {}
@@ -2411,7 +2411,7 @@ class Compiler:
                 quit()
 
         self.tokens = Tokens(section)
-        
+
         if "_OPAL_PRINT_RETURN_" in [x.tok for x in self.tokens.tokens]:
             self.flags["OPAL_PRINT_RETURN"] = True
             self.out += "from libs._internals import _OPAL_PRINT_RETURN_\n"
@@ -2443,7 +2443,7 @@ class Compiler:
         if result != "":
             with open(fileOut, "w", encoding = "utf-8") as txt:
                 txt.write(result)
-    
+
     def compileToPY(self, fileIn, fileOut, top = ""):
         self.__cy = False
         self.__compileWrite(fileIn, fileOut, top)

@@ -1,7 +1,7 @@
 """
 MIT License
 
-Copyright (c) 2020 thatsOven
+Copyright (c) 2020 Amari Calipso
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -161,7 +161,7 @@ class Graphics:
             if self.framerate is not None:
                 self.__clock.tick(self.framerate)
             else:
-                self.__clock.tick()                
+                self.__clock.tick()
 
             if self.__showFps:
                 self.setCaption(self.caption + " - FPS: " + str(round(self.__clock.get_fps(), 3)), False)
@@ -173,7 +173,7 @@ class Graphics:
 
             while self.stopped:
                 self.drawLoop()
-                
+
                 for event in pygame.event.get():
                     if self.__updateSize and event.type == pygame.VIDEORESIZE:
                         self.screen     = pygame.display.get_surface()
@@ -303,7 +303,7 @@ class Graphics:
     def rectangle(self, position : Vector, size : Vector, color = (255, 255, 255), thickness = 0, alpha = 255, fromCenter = False, surf = None):
         if surf is None:
             surf = self.screen
-        
+
         lSize = size.toList(2)
         rectSurf = pygame.Surface(lSize)
         pygame.draw.rect(rectSurf, color, [0, 0] + lSize, thickness)
@@ -397,7 +397,7 @@ class Graphics:
     def drawOutlineText(self, text : list, pos : Vector, color = (255, 255, 255), outlineColor = (0, 0, 0), outlineSize = 2, font = None, surf = None):
         if surf is None:
             surf = self.screen
-        
+
         if font is None:
             font = self.font
 

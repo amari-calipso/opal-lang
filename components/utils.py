@@ -1,7 +1,7 @@
 """
 MIT License
 
-Copyright (c) 2020 thatsOven
+Copyright (c) 2020 Amari Calipso
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -40,7 +40,7 @@ class NameStack:
 
             if curr[1] == item:
                 return curr
-            
+
     def lookforBeforeFn(self, item):
         array = self.array.copy()
 
@@ -52,7 +52,7 @@ class NameStack:
 
             if curr[1] == item:
                 return False
-            
+
         return True
 
     def getCurrentLocation(self):

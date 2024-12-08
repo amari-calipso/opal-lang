@@ -1,15 +1,15 @@
 
 # MIT License
-# 
-# Copyright (c) 2020 thatsOven
-# 
+#
+# Copyright (c) 2020 Amari Calipso
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
 
@@ -45,7 +45,7 @@ inline: new function findMinMaxWithKey(array: object, a: int, b: int, getfn: obj
     }
 
     return currMin, currMax;
-} 
+}
 
 $cdef
 $cy wraparound False
@@ -101,7 +101,7 @@ new function __sortWithKey(array: object, a: int, b: int, getfn: object) void {
     $cdef
     new (size_t*) count  = <size_t*>PyMem_Malloc((auxLen + 1) * sizeof(size_t)),
                   offset = <size_t*>PyMem_Malloc((auxLen + 1) * sizeof(size_t));
-    
+
     new int i;
     for i in range(auxLen + 1) {
         count[i] = 0;
@@ -140,7 +140,7 @@ new function __sortWithKey(array: object, a: int, b: int, getfn: object) void {
 
                 if from_ == orig {
                     break;
-                } 
+                }
             }
         }
     }
@@ -160,7 +160,7 @@ new function __sort(array: object, a: int, b: int) void {
     $cdef
     new (size_t*) count  = <size_t*>PyMem_Malloc((auxLen + 1) * sizeof(size_t)),
                   offset = <size_t*>PyMem_Malloc((auxLen + 1) * sizeof(size_t));
-    
+
     new int i;
     for i in range(auxLen + 1) {
         count[i] = 0;
@@ -199,7 +199,7 @@ new function __sort(array: object, a: int, b: int) void {
 
                 if from_ == orig {
                     break;
-                } 
+                }
             }
         }
     }

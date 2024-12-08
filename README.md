@@ -1,14 +1,14 @@
 ﻿![](logo.png)thanks to aphitorite for the beautiful logo!
-    
-# opal 
-opal is a transcompiled programming language based on Python and Cython. 
+
+# opal
+opal is a transcompiled programming language based on Python and Cython.
 
 # Compiler usage
 [ ] = optional
 * To compile to a Python `.py` file: `opal pycompile input_file [output_file]`
 * To compile to a Cython `.pyx` file: `opal pyxcompile input_file [output_file]`
 * To compile to a Cython module: `opal compile input_file [output_file]`
-* To compile to an executable: `opal release build_file` or `opal pyrelease build_file` (if the program is `--nocompile`). Note that this requires an internet connection to fetch and install dependencies to the target. An opal build file is structured like a [ianthe project file](https://github.com/thatsOven/ianthe);
+* To compile to an executable: `opal release build_file` or `opal pyrelease build_file` (if the program is `--nocompile`). Note that this requires an internet connection to fetch and install dependencies to the target. An opal build file is structured like a [ianthe project file](https://github.com/amari-calipso/ianthe);
 * To directly run opal source: `opal file_name`
 # Command line arguments
 - `--type-mode`
@@ -61,7 +61,7 @@ The `new` statement uses the following syntax:
 ```
 new itemType itemName
 ```
-`new` will accept as types: 
+`new` will accept as types:
 - Python integrated types;
 - Custom defined types;
 - `dynamic`
@@ -161,7 +161,7 @@ match aVariable {
 	default {
 		# aVariable is not in any of the cases
 		# the default statement should always be last
-		# (or second to last in case a 
+		# (or second to last in case a
 		# found statement is used)
 	}
 	found {
@@ -170,7 +170,7 @@ match aVariable {
 	}
 }
 ```
-The other `match` implementation consists in an `elif` chain. It's accessible by specifying the operator to be used. 
+The other `match` implementation consists in an `elif` chain. It's accessible by specifying the operator to be used.
 ```
 match:(!=) aVariable {
 	# cases here
@@ -191,7 +191,7 @@ while someCondition {
 ```
 do {
 	# your code here
-	
+
 	# the condition will be checked at the end
 	# of each iteration
 } while someCondition;
@@ -234,7 +234,7 @@ opal's exception handling follows Python's syntax, with different keywords.
 ```
 try {
 	# something that might give an error
-} 
+}
 # if a ValueError occurs, do nothing
 ignore ValueError;
 catch Exception as e {
@@ -264,7 +264,7 @@ abstract: new class AnAbstractClass {
 	new method add(a, b) {
 		return a + b;
 	}
-	
+
 	abstract: new method anAbstractMethod();
 }
 ```
@@ -275,14 +275,14 @@ new class MyClass {
 	new method __init__(a) {
 		this.a = a;
 	}
-	
+
 	property myProperty {
 		get {
 			return this.a;
 		}
 		set {
 			this.a = value;
-	
+
 			# the "value" variable name can be changed:
 			# set(myValue) {
 			#     this.a = myValue;
@@ -300,7 +300,7 @@ new class myClass {
 	new method __init__(a) {
 		this.a = a;
 	}
-	
+
 	property myProperty {
 		get {
 			return this.a;
@@ -309,7 +309,7 @@ new class myClass {
 			del this.a;
 		}
 	}
-	
+
 	set<myProperty>(myValue) {
 		this.a = myValue;
 	}
@@ -325,7 +325,7 @@ main {
 
 main() {
 	# using brackets generates a main function.
-	
+
 	# defining one is not mandatory, but it's
 	# generally good practice. only one main
 	# function can be defined
@@ -352,7 +352,7 @@ error (in test.opal: a(), line 2, pos 4): unknown statement or identifier
  2 |     b(x - 1);
    |     ^
  3 | }
- 4 | 
+ 4 |
  5 | new function b(x) {
 ```
 To solve this, we can create the identifier ourselves:
@@ -390,7 +390,7 @@ enum MyEnum {
 The values of each constant can be chosen when defining the `enum`:
 ```
 enum MyEnum {
-	CONST0 = "hi", 
+	CONST0 = "hi",
 	CONST1 = 2,
 	CONST2 = 3.14
 }
@@ -455,7 +455,7 @@ new function add(a: int, b: int) int {
 }
 ```
 ### `global`
-The `global` flag is used to declare an object in the global scope. 
+The `global` flag is used to declare an object in the global scope.
 ```
 new function aFunction() {
 	global: new int a = 2, b = 3;
@@ -594,11 +594,11 @@ Tells the precompiler to directly transcribe code to the result until a `$restor
 if a != b {
 	if a < b {
 		$nocompile
-		
+
 for i in range(a, b):
 	if i > 2:
 		print(i)
-		
+
 		$restore
 	}
 }
@@ -658,7 +658,7 @@ new function mallocTest() {
 
 	$cdef
 	new (int*) memory = <int*>PyMem_Malloc(20 * sizeof(int));
-	
+
 	memory[0] = 2;
 	PyMem_Free(memory);
 }
@@ -676,10 +676,10 @@ not variable; # this also produces the same result
 - `&&`: Equivalent to Python's `and`;
 - `?`: It's used for debugging purposes. It prints the given expression and returns it:
 ```
-myFunction(a, ?(b), c); 
+myFunction(a, ?(b), c);
 # the content of b will be printed
 
-?c; 
+?c;
 # the content of c will be printed
 ```
 - `<-`: It's used to convert variables to a type during an assignment:
@@ -694,15 +694,15 @@ dynamic <- a = Vector(2, 3);
 # type of a is dynamic
 ```
 Typing used with the arrow operator follows the same rules as types in the new statement.
-- `++` and `--`: They work as increments (respectively `+= 1` and `-= 1`). They are only allowed as statements, that is, 
-they can't be used inside expressions. They can be used inside the first and last parts of a C-like for statement, and 
+- `++` and `--`: They work as increments (respectively `+= 1` and `-= 1`). They are only allowed as statements, that is,
+they can't be used inside expressions. They can be used inside the first and last parts of a C-like for statement, and
 inside an inline type conversion (arrow operator). These syntaxes are all valid:
 ```
 new int var = 0;
 var++;
 var--:
 
---var; # this "operator-first" syntax is only allowed as a statement alone, 
+--var; # this "operator-first" syntax is only allowed as a statement alone,
 # that is, for example, it won't work in a for loop.
 ++var;
 

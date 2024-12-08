@@ -1,7 +1,7 @@
 """
 MIT License
 
-Copyright (c) 2020 thatsOven
+Copyright (c) 2020 Amari Calipso
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -43,7 +43,7 @@ def build(file, debug = False):
     try:
         setup(
             name         = os.path.basename(file).split(".")[0],
-            include_dirs = [numpy.get_include()], 
+            include_dirs = [numpy.get_include()],
             ext_modules  = cythonize(file, compiler_directives = {
                 "language_level": "3"
             }),
@@ -66,7 +66,7 @@ def compileBase(compiler, filename, name, top, time):
     print("opal -> Cython: Done in " + str(round(default_timer() - time, 4)) + " seconds")
 
     ok = build(f"{name}.pyx", debug)
-                    
+
     if os.path.exists(f"{name}.pyx"): os.remove(f"{name}.pyx")
     if os.path.exists(f"{name}.c"):   os.remove(f"{name}.c")
 
@@ -172,12 +172,12 @@ def release(fn):
 
         for module in compiler.imports:
             if module not in NO_INSTALL: subprocess.run([
-                sys.executable, "-m", "pip", "install", "--isolated", "--exists-action", "w", 
-                f"--target={str(os.path.join(dst, name))}", module, 
+                sys.executable, "-m", "pip", "install", "--isolated", "--exists-action", "w",
+                f"--target={str(os.path.join(dst, name))}", module,
             ])
 
-        os.chdir(curr) 
-        for file in set(os.listdir(curr)) - before: 
+        os.chdir(curr)
+        for file in set(os.listdir(curr)) - before:
             os.chmod(file, 0o777)
             os.remove(file)
 
@@ -187,7 +187,7 @@ def release(fn):
 
 if __name__ == "__main__":
     if len(sys.argv) == 1:
-        print(f"opal compiler v{'.'.join([str(x) for x in VERSION])} - thatsOven")
+        print(f"opal compiler v{'.'.join([str(x) for x in VERSION])}")
     else:
         compiler = Compiler()
         compiler.handleArgs(sys.argv)
@@ -319,6 +319,6 @@ if __name__ == "__main__":
                 top = 'new dynamic HOME_DIR=r"' + drt + '";'
 
             result = compiler.compileFile(sys.argv[1], top)
-            if not compiler.hadError: 
+            if not compiler.hadError:
                 sys.argv = sys.argv[1:]
                 exec(result)
